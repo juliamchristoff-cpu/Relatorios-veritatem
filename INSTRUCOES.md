@@ -65,6 +65,16 @@ Quando a conexão do Meta Ads (`MCP Meta`) estiver disponível, o pedido pode se
    no Drive, convertidas por `scripts/google_planilha.py`. Só use se a pessoa disser que o script está ativo.)*
 6. **Gerar:** `gerar_relatorio.py` com os CSVs do Meta e do Google em `--arquivos` e `--previas-links`. Sem prévias (ou se a pessoa pedir PDF direto), omita `--previas-links` e o PDF sai pronto.
 
+## Mensagem para o cliente (WhatsApp)
+
+Todo relatório gera também a mensagem padrão da Veritatem: vem no campo `mensagem` do JSON impresso
+pelo gerador (e salva em `<nome do relatório>_mensagem.txt`). Depois de entregar o relatório, **cole a
+mensagem na resposta, dentro de um bloco de código**, exatamente como veio, para a pessoa copiar e
+mandar no grupo do cliente. Não reescreva nem acrescente números: ela usa os mesmos dados do relatório.
+Formato: saudação conforme a hora, período, bloco do Google (impressões, cliques, conversões e valor
+investido) e bloco do Meta (impressões, alcance, cliques e valor investido, mais conversas/leads/compras
+quando a conta tiver). Negrito com `*` e linhas com `>` (citação do WhatsApp).
+
 ## Fluxo com arquivos exportados
 
 1. Confirme três informações (pergunte só o que não estiver claro na mensagem ou nos arquivos):

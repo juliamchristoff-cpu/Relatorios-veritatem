@@ -1046,6 +1046,8 @@ def secao_meta(d, cliente, destaques_forcados):
         rot, v = max(t["_por_tipo"].items(), key=lambda kv: kv[1])
         if rot not in ("Alcance", "Cliques no link"):
             escolhidos.append((None, rot, rot, v))
+    MSG["meta"] = {"gasto": gasto, "impressoes": imp, "alcance": alc, "cliques": ctodos,
+                   "resultados": [(c, v) for c, _, _, v in escolhidos if c in ("conversas", "leads", "compras")]}
 
     def custo_de(chave, rot_ind, v):
         if base is None or "gasto" not in base.columns:
@@ -1281,6 +1283,7 @@ def secao_google(d, cliente):
         if inter > 0:
             tx = base.loc[m, "conversoes"].sum() / inter
 
+    MSG["google"] = {"custo": custo, "impressoes": imp, "cliques": clq, "conversoes": conv}
     n_camp = len(d["campanhas"]) if d.get("campanhas") is not None else 0
     cpconv = div(custo, conv)
     lista_tiles = [("Investimento", f_money(custo),
@@ -1336,6 +1339,62 @@ def secao_google(d, cliente):
         h += bloco("Dispositivos", '<div class="tres">' + "".join(partes) + "</div>")
     return h + "</section>"
 
+
+
+# ---------------------------------------------------------------- mensagem para o cliente
+MSG = {}  # totais usados na mensagem de WhatsApp (preenchidos pelas seções)
+MESES = ["janeiro", "fevereiro", "março", "abril", "maio", "junho", "julho", "agosto", "setembro",
+         "outubro", "novembro", "dezembro"]
+
+
+def _n(x):
+    return f"{int(round(x)):,}".replace(",", ".")
+
+
+def _rs(x):
+    return "R$" + f"{x:,.2f}".replace(",", "X").replace(".", ",").replace("X", ".")
+
+
+def _linha(v, sing, plur):
+    if not ok(v):
+        return None
+    return f"> {_n(v)} {sing if round(v) == 1 else plur}"
+
+
+def montar_mensagem(cliente, tipo, inicio, fim):
+    """Mensagem padrão da Veritatem para WhatsApp (negrito com *, citação com >)."""
+    from datetime import datetime, timedelta, timezone
+    hora = datetime.now(timezone(timedelta(hours=-3))).hour
+    saud = "Bom dia" if hora < 12 else ("Boa tarde" if hora < 18 else "Boa noite")
+    ini, fi = inicio[:5], fim[:5]
+    if tipo == "mensal":
+        mes = MESES[int(inicio[3:5]) - 1]
+        abertura = f"Aqui estão os principais destaques do mês de {mes}. 👇"
+    else:
+        dias = (datetime.strptime(fim, "%d/%m/%Y") - datetime.strptime(inicio, "%d/%m/%Y")).days + 1
+        abertura = f"Aqui estão os principais destaques dos últimos {dias} dias. 👇"
+    partes = [f"{saud}, pessoal! Tudo bem?", abertura,
+              f"*VISÃO GERAL | {cliente.upper()}*\n*Período:* {ini} até {fi}."]
+    g = MSG.get("google")
+    if g:
+        linhas = [_linha(g["impressoes"], "impressão dos anúncios.", "impressões dos anúncios."),
+                  _linha(g["cliques"], "clique nos anúncios.", "cliques nos anúncios."),
+                  _linha(g["conversoes"], "conversão", "conversões")]
+        partes.append("*GOOGLE ADS:*\n" + "\n".join(x for x in linhas if x))
+        if ok(g["custo"]):
+            partes.append(f"*VALOR INVESTIDO:*\n{_rs(g['custo'])}")
+    m = MSG.get("meta")
+    if m:
+        linhas = [_linha(m["impressoes"], "impressão dos anúncios.", "impressões dos anúncios."),
+                  _linha(m["alcance"], "pessoa alcançada.", "pessoas alcançadas."),
+                  _linha(m["cliques"], "clique nos anúncios.", "cliques nos anúncios.")]
+        nomes = {"conversas": ("conversa iniciada.", "conversas iniciadas."), "leads": ("lead.", "leads."),
+                 "compras": ("compra.", "compras.")}
+        linhas += [_linha(v, *nomes[c]) for c, v in m["resultados"]]
+        partes.append("*META ADS:*\n" + "\n".join(x for x in linhas if x))
+        if ok(m["gasto"]):
+            partes.append(f"*VALOR INVESTIDO:*\n{_rs(m['gasto'])}")
+    return "\n\n".join(partes)
 
 
 # ---------------------------------------------------------------- montagem
@@ -1445,7 +1504,9 @@ def main():
         if a.html:
             open(destino[:-4] + ".html", "w", encoding="utf-8").write(html)
         motor = html_para_pdf(html, destino)
-    print(json.dumps({"pdf": destino, "titulo": titulo, "motor": motor,
+    mensagem = montar_mensagem(a.cliente, a.tipo, a.inicio, a.fim)
+    open(os.path.splitext(destino)[0] + "_mensagem.txt", "w", encoding="utf-8").write(mensagem)
+    print(json.dumps({"pdf": destino, "titulo": titulo, "motor": motor, "mensagem": mensagem,
                       "secoes": {k: sorted(v.keys()) for k, v in dados.items()},
                       "avisos": AVISOS}, ensure_ascii=False, indent=2))
 
