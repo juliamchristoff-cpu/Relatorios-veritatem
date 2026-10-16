@@ -46,13 +46,23 @@ Quando a conexão do Meta Ads (`MCP Meta`) estiver disponível, o pedido pode se
    com prévias sai como **HTML para abrir no navegador** (o navegador carrega as imagens) e salvar
    como PDF: rode o gerador com `--previas-links <json>`. Diga à pessoa: abrir no Chrome, Ctrl+P,
    "Salvar como PDF". Os links das imagens valem por alguns dias; peça para salvar o PDF logo.
-5. **Google Ads (planilha do script):** o script do Google Ads (pasta `google-ads-script/`) mantém no
-   Google Drive uma planilha por conta, chamada `Veritatem Google Ads - <nome da conta>`, com os dados
-   dia a dia. Pelo conector do Google Drive: `search_files` com `title contains 'Veritatem Google Ads'`
-   e o nome do cliente; depois `download_file_content` com `exportMimeType`
-   `application/vnd.openxmlformats-officedocument.spreadsheetml.sheet`; decodifique o base64 para um `.xlsx`
-   e rode `python3 scripts/google_planilha.py --planilha <xlsx> --inicio dd/mm/aaaa --fim dd/mm/aaaa --saida <pasta_csv>`.
-   Repasse os avisos (ex.: planilha desatualizada). Sem planilha nem conector do Drive, peça os exports do Google.
+5. **Google Ads (manual, por enquanto):** o Google **não** é puxado automaticamente. Se o cliente tem
+   Google Ads (relatório Meta + Google), já no início peça à pessoa os exports do Google do mesmo
+   período, com esta mensagem (ajuste as datas):
+
+   > Para a parte do Google Ads, me manda os exports de **dd/mm a dd/mm** (CSV ou Excel), com as colunas
+   > Custo, Impr., Cliques, Conversões, Todas as conv., % de impr. na parte superior e % de impr. no topo absoluto:
+   > 1. **Campanhas** (obrigatório)
+   > 2. **Grupos de anúncios**
+   > 3. **Palavras-chave**
+   > 4. **Campanhas segmentado por Dia**
+   >
+   > No Google Ads: abra cada tela, ajuste o período, clique no ícone de download e escolha CSV ou Excel.
+
+   Enquanto espera, já puxe e prepare o Meta. Com os arquivos do Google em mãos, passe-os junto com os
+   CSVs do Meta em `--arquivos`. Dispositivo do Google só entra se a pessoa mandar.
+   *(Futuro, ainda desativado: o script em `google-ads-script/` grava planilhas "Veritatem Google Ads - <conta>"
+   no Drive, convertidas por `scripts/google_planilha.py`. Só use se a pessoa disser que o script está ativo.)*
 6. **Gerar:** `gerar_relatorio.py` com os CSVs do Meta e do Google em `--arquivos` e `--previas-links`. Sem prévias (ou se a pessoa pedir PDF direto), omita `--previas-links` e o PDF sai pronto.
 
 ## Fluxo com arquivos exportados
