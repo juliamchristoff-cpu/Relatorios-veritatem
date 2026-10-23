@@ -1310,10 +1310,14 @@ def secao_google(d, cliente):
         g = dd.groupby("data")[cols].sum(min_count=1).sort_index().fillna(0)
         datas = list(g.index)
         tam = (3.5, 2.5)
-        ctr_d = (g["cliques"] / g["impressoes"].replace(0, float("nan")) * 100).fillna(0).tolist()
         cpc_d = (g["custo"] / g["cliques"].replace(0, float("nan"))).fillna(0).tolist()
-        graficos = [("Cliques e CTR", grafico_linha(datas, [("Cliques", g["cliques"].tolist(), SERIE_1, "y1", "int"),
-                                                            ("CTR", ctr_d, SERIE_2, "y2", "pct")], figsize=tam))]
+        if "impressoes" in g:
+            ctr_d = (g["cliques"] / g["impressoes"].replace(0, float("nan")) * 100).fillna(0).tolist()
+            graficos = [("Cliques e CTR", grafico_linha(datas, [("Cliques", g["cliques"].tolist(), SERIE_1, "y1", "int"),
+                                                                ("CTR", ctr_d, SERIE_2, "y2", "pct")], figsize=tam))]
+        else:  # export diário sem a coluna Impr.
+            graficos = [("Cliques por dia", grafico_linha(datas, [("Cliques", g["cliques"].tolist(), SERIE_1, "y1", "int")],
+                                                          figsize=tam))]
         if "conversoes" in g:
             tx_d = (g["conversoes"] / g["cliques"].replace(0, float("nan")) * 100).fillna(0).tolist()
             graficos.append(("Conversões e taxa", grafico_linha(datas, [("Conversões", g["conversoes"].tolist(), SERIE_1, "y1", "int"),
