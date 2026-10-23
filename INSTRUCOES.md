@@ -103,6 +103,13 @@ python3 scripts/gerar_relatorio.py \
 5. Entregue o PDF com uma linha de contexto. Nome do arquivo:
    `Veritatem_<Cliente>_<Semanal|Mensal>_<inicio>_a_<fim>.pdf` (o script já gera assim).
 
+## Regras por cliente
+
+`references/clientes.json` guarda ajustes fixos de cada cliente (o gerador aplica sozinho pelo nome do
+cliente). Hoje: **Armenza** sem alcance por dispositivo, sem impressões/alcance por horário e sem regiões
+no Meta. Quando alguém pedir um ajuste "como padrão" para um cliente, edite esse arquivo (e, se tiver acesso,
+envie para o repositório). Para esconder algo só uma vez: `--ocultar meta:hora,meta:regiao`.
+
 ## Regras
 
 - **Nunca inventar ou estimar números.** Tudo vem dos exports. Se faltar algo, a seção fica de fora

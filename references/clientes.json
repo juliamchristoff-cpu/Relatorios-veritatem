@@ -1,0 +1,12 @@
+{
+  "_como_usar": "Regras por cliente. 'ocultar' esconde seções do relatório. Meta: dispositivo, hora, regiao, idade, genero, dia, anuncios. Google: dispositivo, palavras, grupos, dia.",
+  "Armenza": {
+    "ocultar": {
+      "meta": [
+        "dispositivo",
+        "hora",
+        "regiao"
+      ]
+    }
+  }
+}

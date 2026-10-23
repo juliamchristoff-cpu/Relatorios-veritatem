@@ -1481,6 +1481,27 @@ def medir_altura(html):
     return h
 
 
+def ocultar_cliente(cliente, extra=""):
+    """Seções escondidas por cliente (references/clientes.json) + --ocultar."""
+    out = {}
+    cfg_path = os.path.join(os.path.dirname(ASSETS), "references", "clientes.json")
+    alvo = norm(cliente)
+    try:
+        cfg = json.load(open(cfg_path, encoding="utf-8"))
+    except Exception:  # noqa: BLE001
+        cfg = {}
+    for nome, regras in cfg.items():
+        if nome.startswith("_"):
+            continue
+        if norm(nome) in alvo or alvo in norm(nome):
+            for plat, secs in regras.get("ocultar", {}).items():
+                out.setdefault(plat, set()).update(secs)
+    for item in [x.strip() for x in extra.split(",") if x.strip()]:
+        plat, _, sec = item.partition(":")
+        out.setdefault(plat, set()).add(sec)
+    return out
+
+
 def nome_arquivo(cliente, tipo, inicio, fim):
     limpo = re.sub(r"[^A-Za-z0-9]+", "_", unicodedata.normalize("NFKD", cliente).encode("ascii", "ignore").decode()).strip("_")
     return f"Veritatem_{limpo}_{'Mensal' if tipo == 'mensal' else 'Semanal'}_{inicio.replace('/', '-')}_a_{fim.replace('/', '-')}.pdf"
@@ -1502,6 +1523,8 @@ def main():
                     help="Pasta com as imagens dos criativos, nomeadas pelo ID do criativo (ex.: 2296495411107944.jpg)")
     ap.add_argument("--previas-links", default=None,
                     help="JSON {id_criativo: {url, grande}}. Gera um HTML para abrir no navegador e salvar como PDF")
+    ap.add_argument("--ocultar", default="",
+                    help="Seções a esconder, ex.: meta:dispositivo,meta:hora,meta:regiao (soma-se ao clientes.json)")
     ap.add_argument("--html", action="store_true", help="Também salva o HTML (para conferência)")
     a = ap.parse_args()
 
@@ -1512,6 +1535,9 @@ def main():
         PREVIAS.update(carregar_links_previas(a.previas_links))
     print("Arquivos identificados:", file=sys.stderr)
     dados = carregar_todos(a.arquivos)
+    for plat, secs in ocultar_cliente(a.cliente, a.ocultar).items():
+        for sec in secs:
+            dados.get(plat, {}).pop(sec, None)
     destaques = {x.strip() for x in a.destaques.split(",") if x.strip()}
     html, titulo = montar_html(a.cliente, a.tipo, a.inicio, a.fim, dados, destaques)
     os.makedirs(a.saida, exist_ok=True)
