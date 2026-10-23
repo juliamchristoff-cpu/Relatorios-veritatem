@@ -41,18 +41,19 @@ ASSETS = os.path.join(os.path.dirname(HERE), "assets")
 
 # ---------------------------------------------------------------- identidade Veritatem
 FONTES = os.path.join(ASSETS, "fontes")
-TINTA = "#211D1E"         # texto principal
-GRAFITE = "#2B2627"       # capa, rodapé e cards de destaque
-LOGO_CINZA = "#4F494B"    # cor da marca (logo)
-PEDRA = "#857E80"         # texto secundário
-NEVOA = "#F3F1EE"         # fundo da página
+TINTA = "#151B2B"         # texto principal
+GRAFITE = "#1F2A44"       # azul-marinho: cards de destaque, barras e rodapé
+LOGO_CINZA = "#3D5A8C"
+PEDRA = "#6B7280"         # texto secundário
+NEVOA = "#F7F7F5"         # fundo da página
 PAPEL = "#FFFFFF"
-LINHA = "#E5E1DC"
-BRONZE = "#B07A45"        # cor de acento
-BRONZE_CLARO = "#EADCCB"
-TRILHO = "#F1EEEA"
-SERIE_1, SERIE_2, SERIE_3 = GRAFITE, BRONZE, "#B3ACAD"
-FUNIL_TONS = ["#2B2627", "#4F494B", "#6E6668", "#8C735E", "#A1774E", "#B07A45"]
+LINHA = "#E4E4E1"
+BRONZE = "#3D5A8C"        # azul de acento
+BRONZE_CLARO = "#C9D4E8"  # azul claro (rótulos sobre fundo escuro)
+TRILHO = "#ECECEA"
+CAPA_DE, CAPA_ATE = "#2A3A5C", "#3E5784"   # degradê da capa
+SERIE_1, SERIE_2, SERIE_3 = GRAFITE, BRONZE, "#93A6C8"
+FUNIL_TONS = ["#1F2A44", "#26365A", "#2E4270", "#354D7E", "#3D5A8C", "#5A75A3"]
 
 
 AVISOS = []
@@ -543,7 +544,7 @@ def _eixo(ax):
     for s in ("top", "right", "left"):
         ax.spines[s].set_visible(False)
     ax.spines["bottom"].set_color(LINHA)
-    ax.grid(axis="y", color="#E9E5E0", linewidth=0.8, linestyle=(0, (2, 3)))
+    ax.grid(axis="y", color="#E6E6E3", linewidth=0.8, linestyle=(0, (2, 3)))
     ax.set_axisbelow(True)
     ax.tick_params(length=0, pad=6)
 
@@ -652,15 +653,16 @@ CSS = """
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:Manrope,Inter,Arial,sans-serif;color:%(tinta)s;background:%(nevoa)s;width:1080px;padding:36px 36px 0;-webkit-font-smoothing:antialiased}
 h1,h2,h3,.tile strong,.kpi strong,.funil-linha .val,.bloco-cab b{font-family:Outfit,Manrope,sans-serif}
-.capa{position:relative;overflow:hidden;background:%(grafite)s;color:#fff;border-radius:22px;padding:40px 48px 50px}
+.capa{position:relative;overflow:hidden;background:linear-gradient(115deg,%(capa_de)s 0%%,%(capa_ate)s 100%%);color:#fff;border-radius:22px;padding:40px 48px 50px}
 .capa .marca{height:30px;position:relative}
-.capa .simbolo{position:absolute;right:-60px;top:24px;width:460px;opacity:.07}
+.capa .simbolo{display:none}
+.capa .ondas{position:absolute;left:0;right:0;bottom:0;width:100%%;height:100%%}
 .capa .eyebrow{position:relative;margin-top:78px;font-size:12px;letter-spacing:.22em;text-transform:uppercase;color:%(bronze_claro)s;font-weight:600}
 .capa h1{position:relative;font-size:52px;font-weight:600;letter-spacing:-.01em;margin-top:12px;line-height:1.05}
 .capa .periodo{position:relative;margin-top:14px;font-size:17px;color:rgba(255,255,255,.78)}
 .capa .chips{position:relative;margin-top:26px;display:flex;gap:8px}
 .capa .chips span{border:1px solid rgba(255,255,255,.22);border-radius:999px;padding:6px 14px;font-size:12px;color:rgba(255,255,255,.85)}
-.capa .fio{position:absolute;left:48px;bottom:0;width:120px;height:4px;background:%(bronze)s}
+.capa .fio{position:absolute;left:48px;bottom:0;width:120px;height:4px;background:%(bronze_claro)s;opacity:.55}
 .plat{margin-top:46px}
 .plat-cab{display:flex;align-items:flex-end;justify-content:space-between;border-bottom:1px solid %(linha)s;padding-bottom:14px;margin-bottom:22px}
 .plat-cab h2{font-size:34px;font-weight:600;letter-spacing:-.01em;line-height:1}
@@ -688,7 +690,7 @@ h1,h2,h3,.tile strong,.kpi strong,.funil-linha .val,.bloco-cab b{font-family:Out
 .cartao h4 small{font-weight:400;color:%(pedra)s;margin-left:6px}
 table{width:100%%;border-collapse:collapse;font-size:11.5px}
 th{color:%(pedra)s;font-weight:600;font-size:9.5px;letter-spacing:.06em;text-transform:uppercase;padding:13px 9px 11px;text-align:right;border-bottom:1px solid %(linha)s;vertical-align:bottom}
-td{padding:11px 9px;text-align:right;border-bottom:1px solid #EFECE8;vertical-align:middle;font-variant-numeric:tabular-nums}
+td{padding:11px 9px;text-align:right;border-bottom:1px solid #EFEFEC;vertical-align:middle;font-variant-numeric:tabular-nums}
 tr:last-child td{border-bottom:none}
 th:first-child,td:first-child{text-align:left}
 td.nome{max-width:250px;font-weight:600;font-size:11px;word-break:break-word}
@@ -727,12 +729,12 @@ td.res small{display:block;color:%(pedra)s;font-size:9.5px;margin-top:2px}
 .criativo b{display:block;font-size:11px;line-height:1.35;min-height:30px}
 .criativo strong{display:block;font-family:Outfit,Manrope,sans-serif;font-size:22px;font-weight:600;margin-top:8px}
 .criativo small{display:block;font-size:10.5px;color:%(pedra)s;margin-top:2px}
-.glossario{display:grid;grid-template-columns:1fr 1fr;gap:12px 30px;font-size:11.5px;line-height:1.55;color:#4A4446}
+.glossario{display:grid;grid-template-columns:1fr 1fr;gap:12px 30px;font-size:11.5px;line-height:1.55;color:#4B5263}
 .glossario b{color:%(tinta)s}
 .rodape{margin-top:48px;background:%(grafite)s;border-radius:22px 22px 0 0;padding:26px 40px;display:flex;align-items:center;justify-content:space-between;color:rgba(255,255,255,.66);font-size:11.5px}
 .rodape img{height:24px}
 """ % dict(tinta=TINTA, nevoa=NEVOA, grafite=GRAFITE, bronze=BRONZE, bronze_claro=BRONZE_CLARO,
-           linha=LINHA, pedra=PEDRA, papel=PAPEL, trilho=TRILHO)
+           linha=LINHA, pedra=PEDRA, papel=PAPEL, trilho=TRILHO, capa_de=CAPA_DE, capa_ate=CAPA_ATE)
 
 
 def tiles(itens):
@@ -1397,6 +1399,27 @@ def montar_mensagem(cliente, tipo, inicio, fim):
     return "\n\n".join(partes)
 
 
+def ondas_svg(w=1008, h=330, linhas=30):
+    """Linhas onduladas claras (fundo da capa), no estilo topográfico da Veritatem."""
+    import math
+    caminhos = []
+    for k in range(linhas):
+        t = k / (linhas - 1)
+        base = h * (0.62 + 0.45 * t)
+        pts = []
+        for i in range(0, 101):
+            x = w * i / 100
+            u = i / 100
+            morro = math.exp(-((u - 0.58) / 0.13) ** 2) * (0.62 - 0.35 * t) * h * 0.55
+            morro += math.exp(-((u - 0.78) / 0.10) ** 2) * (0.45 - 0.25 * t) * h * 0.4
+            morro += math.exp(-((u - 0.36) / 0.16) ** 2) * (0.28 - 0.15 * t) * h * 0.4
+            y = base - morro + 6 * math.sin(u * 9 + k * 0.35)
+            pts.append(f"{x:.1f},{y:.1f}")
+        caminhos.append(f'<polyline points="{" ".join(pts)}"/>')
+    return (f'<svg class="ondas" viewBox="0 0 {w} {h}" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">'
+            f'<g fill="none" stroke="#C9D4E8" stroke-opacity=".22" stroke-width="1">{"".join(caminhos)}</g></svg>')
+
+
 # ---------------------------------------------------------------- montagem
 def montar_html(cliente, tipo, inicio, fim, dados, destaques):
     logo = img_b64(os.path.join(ASSETS, "logo_horizontal_branca.png"))
@@ -1415,7 +1438,7 @@ def montar_html(cliente, tipo, inicio, fim, dados, destaques):
             plataformas.append("Meta Ads")
     if not secoes:
         raise SystemExit("Nenhum dado de Meta ou Google reconhecido nos arquivos enviados.")
-    capa = (f'<header class="capa"><img class="simbolo" src="{simbolo}"><img class="marca" src="{logo}">'
+    capa = (f'<header class="capa">{ondas_svg()}<img class="marca" src="{logo}">'
             f'<div class="eyebrow">Relatório {"mensal" if tipo == "mensal" else "semanal"} de desempenho</div>'
             f"<h1>{esc(cliente)}</h1><div class=\"periodo\">{esc(periodo_extenso(inicio, fim))}</div>"
             f'<div class="chips">{"".join(f"<span>{p}</span>" for p in plataformas)}</div><div class="fio"></div></header>')
